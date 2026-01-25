@@ -1,3 +1,11 @@
+/*
+ * OpenSCAD Common Parameters and Modules
+ * Licenced under CC BY-SA 4.0
+ * By: TSnoad
+ * https://github.com/tsnoad/TBC
+ * https://hackaday.io/project/TBC
+ */
+
 
 pi = 3.1415926535897932384626433;
 

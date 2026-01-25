@@ -1,5 +1,13 @@
 /*
- * Nema17 x 34mm stepper
+ * OpenSCAD Common Parameters and Modules
+ * Licenced under CC BY-SA 4.0
+ * By: TSnoad
+ * https://github.com/tsnoad/TBC
+ * https://hackaday.io/project/TBC
+ */
+
+/*
+ * TBC
  */
  
 heatset_hgt = 5;
