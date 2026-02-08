@@ -514,12 +514,14 @@ module round_step(step_h0,step_h1,step_l,round_r0,round_r1) {
     translate([step_h1-round_r1,step_l]) circle(r=round_r1);
 }
 
-
-
-module round_step_center_h1(step_h0,step_h1,step_l_in,round_r0,round_r1) {
+module round_step_center_h1_child(step_h0,step_h1,step_l_in,round_r0,round_r1) {
     step_l = round_step_len(step_h0,step_h1,step_l_in,round_r0,round_r1);
 
-    translate([0,-step_l]) round_step(step_h0,step_h1,step_l_in,round_r0,round_r1);
+    translate([0,-step_l]) children();
+}
+
+module round_step_center_h1(step_h0,step_h1,step_l_in,round_r0,round_r1) {
+    round_step_center_h1_child(step_h0,step_h1,step_l_in,round_r0,round_r1) round_step(step_h0,step_h1,step_l_in,round_r0,round_r1);
 }
 
 function round_step_angle(step_h0,step_h1,step_l_in,round_r0,round_r1) = let(
@@ -623,12 +625,8 @@ module round_step_3d_co_blind_downwards(step_h0,step_h1,step_l_in,round_r0,round
 }
 
 module round_step_3d_center_h1(step_h0,step_h1,step_l_in,round_r0,round_r1,hgt,bev_btm=0,bev_top=0) {
-
-    step_l = round_step_len(step_h0,step_h1,step_l_in,round_r0,round_r1);
-
-    translate([0,-step_l,0]) round_step_3d(step_h0,step_h1,step_l_in,round_r0,round_r1,hgt,bev_btm,bev_top);
+    round_step_center_h1_child(step_h0,step_h1,step_l_in,round_r0,round_r1) round_step_3d(step_h0,step_h1,step_l_in,round_r0,round_r1,hgt,bev_btm,bev_top);
 }
-
 
 module round_step_area(step_h0,step_h1,step_l0,step_l_in,round_r0,round_r1,trans_arr=[[0,0,0]]) {
     step_l = round_step_len(step_h0,step_h1,step_l_in,round_r0,round_r1);
