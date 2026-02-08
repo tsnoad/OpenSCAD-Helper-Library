@@ -18,16 +18,19 @@ OPENSCAD ?= $(DEFAULT_OPENSCAD)
 TARGET_SCAD ?= $(DEFAULT_TARGET_SCAD)
 RENDER_FN ?= $(DEFAULT_RENDER_FN)
 
-# Only try to find targets if we're not running config and the target file exists
-ifneq (,$(filter-out config,$(MAKECMDGOALS)))
-  ifneq (,$(wildcard $(TARGET_SCAD)))
-    TARGETS=$(shell sed '/^\*\/\* make '\''[a-zA-Z0-9_-]*'\'' \*\//!d;s/\*\/\* make '\''//;s/'\''.*/.stl/' $(TARGET_SCAD))
-    
-    # Check if any targets were found
-    ifeq ($(strip $(TARGETS)),)
-      ifeq (,$(filter config clean list,$(MAKECMDGOALS)))
-        $(error No render targets found in $(TARGET_SCAD). Add target markers like: /* make 'part_name' */ before the objects you want to render)
-      endif
+# Try to find targets if the target file exists
+ifneq (,$(wildcard $(TARGET_SCAD)))
+  STL_TARGETS=$(shell sed '/^\*\/\* make '\''[a-zA-Z0-9_-]*'\'' \*\//!d;s/\*\/\* make '\''//;s/'\''.*/.stl/' $(TARGET_SCAD))
+  PNG_TARGETS=$(shell sed '/^\*\/\* make image '\''[a-zA-Z0-9_-]*'\'' \*\//!d;s/\*\/\* make image '\''//;s/'\''.*/.png/' $(TARGET_SCAD))
+  TARGETS=$(STL_TARGETS) $(PNG_TARGETS)
+  
+  # Check if any targets were found (but only error for build commands)
+  ifeq ($(strip $(TARGETS)),)
+    ifneq (,$(filter all,$(MAKECMDGOALS)))
+      $(error No render targets found in $(TARGET_SCAD). Add target markers like: /* make 'part_name' */ for STL or /* make image 'image_name' */ for PNG)
+    endif
+    ifeq ($(MAKECMDGOALS),)
+      $(error No render targets found in $(TARGET_SCAD). Add target markers like: /* make 'part_name' */ for STL or /* make image 'image_name' */ for PNG)
     endif
   endif
 endif
@@ -47,6 +50,9 @@ CLEANFILES = \
 all: ${TARGETS}
 
 list:
+	@echo "TARGET_SCAD: $(TARGET_SCAD)"
+	@echo "STL_TARGETS: $(STL_TARGETS)"
+	@echo "PNG_TARGETS: $(PNG_TARGETS)"
 	@echo "Targets: ${TARGETS}"
 
 clean:
@@ -121,9 +127,9 @@ config:
 	printf "Enter $$fn value [$(DEFAULT_RENDER_FN)]: "; \
 	read render_fn; \
 	render_fn=$${render_fn:-$(DEFAULT_RENDER_FN)}; \
-	echo "OPENSCAD = $$scad_path" > .makeconfig; \
-	echo "TARGET_SCAD = $$scad_file" >> .makeconfig; \
-	echo "RENDER_FN = $$render_fn" >> .makeconfig; \
+	printf 'OPENSCAD = "%s"\n' "$scad_path" > .makeconfig; \
+	printf 'TARGET_SCAD = "%s"\n' "$scad_file" >> .makeconfig; \
+	printf 'RENDER_FN = %s\n' "$render_fn" >> .makeconfig; \
 	echo ""; \
 	echo ".makeconfig created with:"; \
 	cat .makeconfig; \
@@ -131,13 +137,22 @@ config:
 	echo "Add .makeconfig to your .gitignore to keep project-specific settings local"
 
 # Keep auto-generated .scad files to avoid constant rebuilds
-.SECONDARY: $(shell echo "${TARGETS}" | sed 's/\.stl/.scad/g')
+.SECONDARY: $(shell echo "${TARGETS}" | sed 's/\.stl/.scad/g;s/\.png/.scad/g')
 
 # Explicit wildcard expansion suppresses errors when no files are found
 include $(wildcard *.deps)
 
+
+sed 's/^\*\/\* make\( image\)\? '\''$*'\'' \*\/\ /\!/;s/^$$fn \= [0-9]*\;/$$fn = 314\;/' 
+
 %.scad:
-	sed 's/^\*\/\* make '\''$*'\'' \*\/\ /\!/;s/^$$fn \= [0-9]*\;/$$fn = $(RENDER_FN)\;/' $(TARGET_SCAD) > $@
+	sed 's/^\*\/\* make '\''$*'\'' \*\/\ /\!/;s/^\*\/\* make image '\''$*'\'' \*\/\ /\!/;s/^$$fn \= [0-9]*\;/$$fn = $(RENDER_FN)\;/' $(TARGET_SCAD) > $@
+
+#%.stl: %.scad
+#	$(OPENSCAD) --enable fast-csg-safer --enable manifold -o $@ $
 
 %.stl: %.scad
-	$(OPENSCAD) --enable fast-csg-safer --enable manifold -o $@ $
+	"$(OPENSCAD)" --enable fast-csg-safer --enable manifold -o $@ $<
+
+%.png: %.scad
+	"$(OPENSCAD)" --enable fast-csg-safer --enable manifold --projection o --imgsize=1920,1080 -o $@ $<
