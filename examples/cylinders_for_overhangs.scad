@@ -9,21 +9,9 @@
 include <../common_params_and_modules.scad>;
 $fn = 36;
 
-// Set the camera - so we can automatically render some screenshots
-$vpt = [100+5,-10,0]/2;
-$vpr = [90+7.5,0,7.5];
-$vpd = 300;
+cylinders_oh();
 
-//This line will be recognised by the makefile, and will let us render automatically
-*/* make 'example_cylinders_for_overhangs' */ example();
-
-example();
-
-module example() {
-	cylinders();
-}
-
-module cylinders() rotate([90,0,0]) {
+module cylinders_oh() rotate([90,0,0]) {
 	//cylinder with flat walls
 	cylinder_oh_bev(5,10,bev_m,bev_m);
 

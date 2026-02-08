@@ -9,20 +9,8 @@
 include <../common_params_and_modules.scad>;
 $fn = 36;
 
-// Set the camera - so we can automatically render some screenshots
-$vpt = [100+5,40,10]/2;
-$vpr = [60,0,-15];
-$vpd = 300;
-
-//This line will be recognised by the makefile, and will let us render automatically
-*/* make 'example_cylinders' */ example();
-
-example();
-
-module example() {
-	cylinders();
-	translate([0,40,0]) cylinders_cross_section();
-}
+cylinders();
+translate([0,40,0]) cylinders_cross_section();
 
 module cylinders() {
 	// Simple cylinder with beveled edges
