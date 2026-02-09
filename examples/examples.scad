@@ -17,11 +17,18 @@ use <cylinders.scad>;
 use <cylinders_for_overhangs.scad>;
 
 //This line will be recognised by the makefile, and will let us render automatically
+*/* make 'example_cylinders' */ translate(-[100+5,40,10]/2) {
+	cylinders();
+	translate([0,40,0]) cylinders_cross_section();
+}
 */* make image 'example_cylinders' */ translate(-[100+5,40,10]/2) {
 	cylinders();
 	translate([0,40,0]) cylinders_cross_section();
 }
 
+*/* make 'example_cylinders_for_overhangs' */ translate(-[100+5,-10,10]/2) {
+	cylinders_oh();
+}
 */* make image 'example_cylinders_for_overhangs' */ translate(-[100+5,-10,10]/2) {
 
 // $vpt = [100+5,-10,0]/2;
