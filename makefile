@@ -127,9 +127,9 @@ config:
 	printf "Enter $$fn value [$(DEFAULT_RENDER_FN)]: "; \
 	read render_fn; \
 	render_fn=$${render_fn:-$(DEFAULT_RENDER_FN)}; \
-	printf 'OPENSCAD = "%s"\n' "$scad_path" > .makeconfig; \
-	printf 'TARGET_SCAD = "%s"\n' "$scad_file" >> .makeconfig; \
-	printf 'RENDER_FN = %s\n' "$render_fn" >> .makeconfig; \
+	printf 'OPENSCAD = "%s"\n' "$$scad_path" > .makeconfig; \
+	printf 'TARGET_SCAD = "%s"\n' "$$scad_file" >> .makeconfig; \
+	printf 'RENDER_FN = %s\n' "$$render_fn" >> .makeconfig; \
 	echo ""; \
 	echo ".makeconfig created with:"; \
 	cat .makeconfig; \
