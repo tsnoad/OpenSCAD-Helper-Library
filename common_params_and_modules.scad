@@ -106,6 +106,10 @@ function rotation_matrix_x(angle) = [[1,0,0],[0,cos(angle),-sin(angle)],[0,sin(a
 function rotation_matrix(angle) = rotation_matrix_z(angle);
 
 
+//rotate an array of xy points (not xyz - ie. an array of 2d vectors)  around the z axis
+function rotation_matrix_2d_z(angle) = [[cos(angle),-sin(angle)],[sin(angle),cos(angle)]];
+
+
 // For an circular segment of a given chord length and segment width, give us the radius of the circle
 function segment_wid_to_radius(chord_len_half,seg_wid) = (pow(seg_wid,2) + pow(chord_len_half,2)) / (2*seg_wid);
 
