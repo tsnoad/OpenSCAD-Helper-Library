@@ -665,17 +665,46 @@ module round_step_area(step_h0,step_h1,step_l0,step_l_in,round_r0,round_r1,trans
     }
 }
 
-module trigrid_co_through(trigrid_r=1,trigrid_hh=10,extent=100,trigrid_co_h=10,bev_btm=0,bev_top=0) {
-    trigrid_wh = trigrid_hh*tan(30);
+function trigrid_wh(trigrid_r=1,trigrid_hh=10,extent=100,trigrid_co_h=10) = trigrid_hh*tan(30);
+function trigrid_triangle_points(trigrid_r=1,trigrid_hh=10,extent=100,trigrid_co_h=10) = points_reg_polygon_point(3)*(2*trigrid_wh(trigrid_r,trigrid_hh,extent,trigrid_co_h)/cos(30)-(w6/2+trigrid_r)/sin(30));
+
+module trigrid_trans(trigrid_r=1,trigrid_hh=10,extent=100,trigrid_co_h=10) {
+    trigrid_wh = trigrid_wh(trigrid_r,trigrid_hh,extent,trigrid_co_h);
     trigrid_ext = round(extent*1.5/(2*trigrid_wh));
     
     for(ix=[-trigrid_ext:trigrid_ext]) for(iy=[-trigrid_ext:trigrid_ext]) translate([ix*2*trigrid_wh,iy*2*trigrid_hh,0]) {
         mirror([0,(floor(abs(ix)/2)*2==abs(ix)?0:1),0]) mirror([0,(floor(abs(iy)/2)*2==abs(iy)?0:1),0]) {
             //cutout each triangle in the grid
             translate([0,2*trigrid_wh/tan(60)-trigrid_hh,0]) {
-                cylinder_bev_co_through(trigrid_r,trigrid_co_h,bev_btm,bev_top,0,points_reg_polygon_point(3)*(2*trigrid_wh/cos(30)-(w6/2+trigrid_r)/sin(30)));
+                children();
             }
         }
+    }
+
+}
+
+module trigrid_co_through(trigrid_r=1,trigrid_hh=10,extent=100,trigrid_co_h=10,bev_btm=0,bev_top=0) {
+    trigrid_trans(trigrid_r,trigrid_hh,extent,trigrid_co_h) {
+        cylinder_bev_co_through(trigrid_r,trigrid_co_h,bev_btm,bev_top,0,trigrid_triangle_points(trigrid_r,trigrid_hh,extent,trigrid_co_h));
+    }
+    
+    // trigrid_wh = trigrid_wh(trigrid_r,trigrid_hh,extent,trigrid_co_h);
+    // trigrid_ext = round(extent*1.5/(2*trigrid_wh));
+
+    // for(ix=[-trigrid_ext:trigrid_ext]) for(iy=[-trigrid_ext:trigrid_ext]) translate([ix*2*trigrid_wh,iy*2*trigrid_hh,0]) {
+    //     mirror([0,(floor(abs(ix)/2)*2==abs(ix)?0:1),0]) mirror([0,(floor(abs(iy)/2)*2==abs(iy)?0:1),0]) {
+    //         //cutout each triangle in the grid
+    //         translate([0,2*trigrid_wh/tan(60)-trigrid_hh,0]) {
+    //             cylinder_bev_co_through(trigrid_r,trigrid_co_h,bev_btm,bev_top,0,points_reg_polygon_point(3)*(2*trigrid_wh/cos(30)-(w6/2+trigrid_r)/sin(30)));
+    //         }
+    //     }
+    // }
+}
+
+
+module trigrid_co_blind_downwards(trigrid_r=1,trigrid_hh=10,extent=100,trigrid_co_h=10,bev_btm=0,bev_top=0) {
+    trigrid_trans(trigrid_r,trigrid_hh,extent,trigrid_co_h) {
+        cylinder_bev_co_blind_downwards(trigrid_r,trigrid_co_h,bev_btm,bev_top,0,trigrid_triangle_points(trigrid_r,trigrid_hh,extent,trigrid_co_h));
     }
 }
 
